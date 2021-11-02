@@ -1,0 +1,32 @@
+body {
+   background-color: black;
+   color: white;
+}
+
+.main {
+   position: absolute;
+   top: 40px;
+   bottom: 20px;
+   width:100%;
+}
+
+.greeting {
+   left : 0;
+   position: absolute;
+   text-align: center;
+   top: 50%;
+   width: 100%;
+}
+
+canvas {
+   width: 640px;
+   height: 320px;
+   top: 30%;
+   left: 30%;
+   position: absolute;
+   text-align: center;
+}
+
+.upload {
+   padding-top: 40%;
+}
