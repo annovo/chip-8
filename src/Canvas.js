@@ -26,7 +26,7 @@ const Canvas = () => {
          for(let i = 0; i < width; i++) {
             const displayX = Math.floor(i / ratioX);
             const displayY = Math.floor(j / ratioY);
-            const pixel = display[displayY] && display[displayY][displayX] ? 0 : 255;
+            let pixel = display[displayY] && display[displayY][displayX] ? 0 : 255;
             let point = 4*(i + width * j);
             
             canvasData.data[point] = pixel;
