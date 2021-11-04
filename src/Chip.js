@@ -30,8 +30,8 @@ const Chip = ({ file, render }) => {
    const [memory, setMemory] = useState([...FONT]);
    const [registers, setRegisters] = useState([]);
    const [display, setDisplay] = useState([]);
-   const [stack, setStack] = useState([]);
-   const [pc, setPC] = useState(FONT.length);
+   //const [stack, setStack] = useState([]);
+   const [pc, setPC] = useState({counter: FONT.length, stack: []});
    const [iRegister, setIregister] = useState(0);
    const [key, setKey] = useState();
    const [dTimer, setDTimer] = useState(0);
@@ -41,7 +41,7 @@ const Chip = ({ file, render }) => {
 
    const changeDisplay = useCallback((VX, VY, N) => {
       let y = registers[VY] & (HEIGHT - 1);
-      let i = iRegister;
+      let i = iRegister - SHIFT;
       const lastRow = N + i;
       let regVF = 0; // setting flag register to 0;
       let newDisplay = [...display];
@@ -80,28 +80,35 @@ const Chip = ({ file, render }) => {
                setDisplay([]);
                render(canvasRef.current.getContext('2d'), display);
             } else if(secondNibble === 0 && fourthNibble === 0xe && thirdNibble === 0xe){
-               setPC(stack[stack.length - 1]);
-               setStack([...stack.slice(0, stack.length - 1)]);
+               setPC(pc => ({
+                  counter: pc.stack[pc.stack.length - 1], 
+                  stack: [...pc.stack.slice(0, pc.stack.length - 1)]
+               }));
+               //setStack(stack => [...stack.slice(0, stack.length - 1)]);
             }
             break;
          case 1:
-            setPC(addr - SHIFT);
+            setPC(p => ({ ...p, counter : addr - SHIFT}));
             break;
          case 2:
-            setStack([...stack, pc]);
-            setPC(addr - SHIFT);
+            setPC(pc => ({
+               stack: [...pc.stack, pc.counter],
+               counter: addr - SHIFT 
+            }));
+            // setStack(stack => [...stack, pc]);
+            // setPC(addr - SHIFT);
             break;
          case 3:
             if(registers[secondNibble] === secondByte)
-               setPC(p => p + 2);
+               setPC(p => ({...p, counter: p.counter + 2}));
             break;
          case 4:
             if(registers[secondNibble] !== secondByte)
-               setPC(p => p + 2);
+               setPC(p => ({...p, counter: p.counter + 2}));
             break;
          case 5:
             if(registers[secondNibble] === registers[thirdNibble])
-               setPC(p => p + 2);
+               setPC(p => ({...p, counter: p.counter + 2}));
             break;
          case 6:
             newReg[secondNibble] = secondByte;
@@ -168,16 +175,17 @@ const Chip = ({ file, render }) => {
             break;
          case 9:
             if(registers[secondNibble] !== registers[thirdNibble])
-               setPC(p => p + 2);
+               setPC(p => ({...p, counter: p.counter + 2}));
             break;
          case 0xA:
-            setIregister(addr - SHIFT);
+            setIregister(addr);
             break;
          case 0xB:
-            setPC((addr + registers[0x0]) - SHIFT);
+            setPC(p => ({...p, counter: (addr + registers[0x0]) - SHIFT }));
+            //setPC((addr + registers[0x0]) - SHIFT);
             break;
          case 0xC:
-            newReg[vx] = Math.floor(Math.random() * (1 << 8)) & secondByte;
+            newReg[secondNibble] = Math.floor(Math.random() * (1 << 8)) & secondByte;
             setRegisters(newReg);
             break;
          case 0xD:
@@ -186,9 +194,9 @@ const Chip = ({ file, render }) => {
             break;
          case 0xE:
             if(thirdNibble === 9 && fourthNibble === 0xe && key === KEYBOARD[registers[secondNibble]]) {
-                setPC(p => p + 2);
+               setPC(p => ({...p, counter: p.counter + 2}));
             } else if(thirdNibble === 0xa && fourthNibble === 1 && key !== KEYBOARD[registers[secondNibble]]) {
-               setPC(p => p + 2);
+               setPC(p => ({...p, counter: p.counter + 2}));
             }
             break;
          case 0xF: 
@@ -205,17 +213,17 @@ const Chip = ({ file, render }) => {
                   setSTimer(registers[secondNibble]);
                   break;
                case 0x1E:
-                  if((registers[secondNibble] + iRegister) >= (0x1000 - SHIFT)) {    // overflow outside the memory
+                  if((registers[secondNibble] + iRegister) >= 0x1000) {    // overflow outside the memory
                      newReg[0xf] = 1;
                   }
-                  setIregister((iRegister + registers[secondNibble]) % (0x1000 - SHIFT));
+                  setIregister((iRegister + registers[secondNibble]) % 0x1000);
                   break;
                case 0x0A:
                   if(key && KEYBOARD.includes(key)) {
                      newReg[secondNibble] = KEYBOARD.indexOf(key);
                      setRegisters(newReg);
                   } else  
-                     setPC(p => p + 2);
+                     setPC(p => ({...p, counter: p.counter + 2}));
                   break;
                case 0x29:
                   // characters 
@@ -223,21 +231,22 @@ const Chip = ({ file, render }) => {
                   break;
                case 0x33:
                   newMem = [...memory];
-                  newMem[iRegister] = Math.floor(registers[secondNibble] / 100);
-                  newMem[iRegister + 1] = Math.floor(registers[secondNibble] / 10) % 10;
-                  newMem[iRegister + 2] =registers[secondNibble] % 10;
+                  const idx = iRegister - SHIFT;
+                  newMem[idx] = Math.floor(registers[secondNibble] / 100);
+                  newMem[idx + 1] = Math.floor(registers[secondNibble] / 10) % 10;
+                  newMem[idx + 2] =registers[secondNibble] % 10;
                   setMemory(newMem);
                   break;
                case 0x55:  // configurable to set iregister to the value of I + X + 1
                   newMem = [...memory];
                   for(let i = 0; i <= secondNibble; i++) {
-                     newMem[iRegister + i] = registers[i];
+                     newMem[iRegister - SHIFT + i] = registers[i];
                   }
                   setMemory(newMem);
                   break;
                case 0x65:  // configurable to set iregister to the value of I + X + 1
                   for(let i = 0; i <= secondNibble; i++) {
-                     newReg[i] = memory[iRegister + i];
+                     newReg[i] = memory[iRegister - SHIFT + i];
                   }
                   setRegisters(newReg);
                   break;
@@ -248,8 +257,8 @@ const Chip = ({ file, render }) => {
          default:
             break;
       }
-      
-   }, [pc, stack, dTimer, iRegister, registers, display, key, memory, render, changeDisplay]);
+      //console.log(instruction.toString(16) + " - " + pc + "/" + stack[stack.length-1]);
+   }, [dTimer, iRegister, registers, display, key, memory, render, changeDisplay]);
 
    useEffect(() => {
       const canvas = canvasRef.current;
@@ -280,8 +289,8 @@ const Chip = ({ file, render }) => {
          if(memory.length <= FONT.length) {
             return;
          }
-         const instr = (memory[pc] << 8) | memory[pc + 1];
-         setPC(p => p + 2);
+         const instr = (memory[pc.counter] << 8) | memory[pc.counter + 1];
+         setPC(p => ({...p, counter: p.counter + 2}));
          decode(instr);
       }, 2);   
       
@@ -310,4 +319,3 @@ const Chip = ({ file, render }) => {
 }
 
 export default Chip;
-//export {load, decode, fetch, display, init, memory, pc};
