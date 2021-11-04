@@ -9,12 +9,6 @@ const Canvas = () => {
    const [message, setMessage] = useState("");
    const [visible, setVisible] = useState();
 
-//   const canvasRef = useRef(null);
-//    1 0         1(0) 1(4) 0(8) 0(12)  4x4
-//    0 1         1(16) 1(20) 0(24) 0(28)
-//                0(32) 0(36) 1(40) 1(44)
-//                0 0 1(56) 1
-
    const render = (cntx, display, dW, dH) => {
       const width = cntx.canvas.width;
       const height = cntx.canvas.height;
