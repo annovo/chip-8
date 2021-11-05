@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import Chip from './Chip'
+import ibmLogo from './files/IBMLogo.ch8'
+import spaceInvaders from './files/SpaceInvaders.ch8'
 import './App.css'
 
 const Canvas = () => {
-   // const [x, setX] = useState(0);
-   // const [y, setY] = useState(0);
    const [file, setFile] = useState([]);
-   const [message, setMessage] = useState("");
-   const [visible, setVisible] = useState();
+   const [selected, setSelected] = useState();
 
    const render = (cntx, display, dW, dH) => {
       const width = cntx.canvas.width;
@@ -31,108 +30,39 @@ const Canvas = () => {
       cntx.putImageData(canvasData, 0, 0);
    }
 
-   // const handleKey = useCallback((e) => {
-   //    const cntx = canvasRef.current.getContext('2d');
-   //    let dirX, dirY;
-   //    switch(e.keyCode) {
-   //       case 37:
-   //          dirX = -1;
-   //          break;
-   //       case 39:
-   //          dirX = 1;
-   //          break;
-   //       case 40:
-   //          dirY = 1;
-   //          break;
-   //       case 38: //ArrowUp
-   //          dirY = -1;
-   //          break;
-   //       default:
-   //          dirX = 0;
-   //          dirY = 0;
-   //    }
-   //    if(dirX === 0 && dirY === 0) 
-   //      return;
-      
-   //    const canvasData = cntx.getImageData(0, 0, cntx.canvas.width, cntx.canvas.height);
-   //    const data = canvasData.data;
-   //    const width = cntx.canvas.width*4;
-   //    if(dirX === 1) {
-   //      for(let j = 0; j <= 16; j++) {
-   //        let idx = (y+j)*width;
-          
-   //        data[idx + x + 1] = 255;
-   //        data[idx + x + 2] = 255;
-  
-   //        data[idx + (x + 4*17) + 1] = 0;
-   //        data[idx + (x + 4*17) + 2] = 0;
-   //      }
-   //      setX(x + 4);
-   //    } else if(dirX === -1) {
-   //      for(let j = 0; j <= 16; j++) {
-   //        let idx = (y+j)*width;
-          
-   //        data[idx + (x + 4*17) + 1] = 255;
-   //        data[idx + (x + 4*17) + 2] = 255;
-  
-   //        data[idx + x + 1] = 0;
-   //        data[idx + x + 2] = 0;
-   //      }
-   //      setX(x - 4);
-   //    } else if(dirY === -1) {
-   //       for(let j = 0; j <= 16*4; j+=4) {
-   //          let idx = (x+j);
-   //          data[idx + (y + 16)*width + 1] = 255;
-   //          data[idx + (y + 16)*width + 2] = 255;
-    
-   //          data[idx + (y - 1) * width + 1] = 0;
-   //          data[idx + (y - 1) * width + 2] = 0;
-   //       }
-   //       setY(y - 1);
-   //    } else if(dirY === 1) {
-   //       for(let j = 0; j <= 16*4; j+=4) {
-   //          let idx = (x+j);
-   //          data[idx + y*width + 1] = 255;
-   //          data[idx + y*width + 2] = 255;
-    
-   //          data[idx + (y + 16 + 1) * width + 1] = 0;
-   //          data[idx + (y + 16 + 1) * width + 2] = 0;
-   //       }
-   //       setY(y + 1);
-   //    }
-   //    cntx.putImageData(canvasData, 0, 0);
-   // }, [x,y]);
+   const handleSelected = async (e) => {
+      setSelected(e.target.value);
+      switch(e.target.value) {
+         case "ibmLogo":
+            upload(await fetch(ibmLogo).then(r => r.blob()));
+            break;
+         case "spaceInv":
+            upload(await fetch(spaceInvaders).then(r => r.blob()));
+            break;
+         default:
+            break;
+      }
+   }
 
-   const uploadGame = (e) => {
-      const newFile = e.target.files[0];
-      if(newFile == null)
+   const upload = (f) => {
+      if(!f)
          return;
-      setVisible(true);
-      newFile.arrayBuffer().then(buffer => {  // need to check if valid file
+      f.arrayBuffer().then(buffer => {  
          let data = new Uint8Array(buffer);
          setFile(data);
       }).catch(e => console.log(e));
-      setMessage(newFile.name + " uploaded");
-      setTimeout(() => {
-         setVisible(false);
-         setMessage("");
-      }, 3000);
-   };
-
-//    useEffect(() => {
-//       document.addEventListener('keydown', handleKey);
-
-//       return () => {
-//         document.removeEventListener('keydown', handleKey);
-//       }
-//   },[handleKey]);
+      
+   }
   
   return (
    <>
       <Chip file = {file} render = {render} />
       <div className = "upload">
-         <input type = "file" onChange = {(e) => uploadGame(e)}/>
-         <span style = {{visibility: visible ? 'visible' : 'hidden'}}>{message}</span>
+         <select value = {selected} onChange = {handleSelected}>
+            <option value = "none" >Select a game</option>
+            <option value = "ibmLogo" >IBM logo</option>
+            <option value = "spaceInv">Space Invaders</option>
+         </select>
       </div>
    </>
   )

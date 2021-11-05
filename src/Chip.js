@@ -30,7 +30,6 @@ const Chip = ({ file, render }) => {
    const [memory, setMemory] = useState([...FONT]);
    const [registers, setRegisters] = useState([]);
    const [display, setDisplay] = useState([]);
-   //const [stack, setStack] = useState([]);
    const [pc, setPC] = useState({counter: FONT.length, stack: []});
    const [iRegister, setIregister] = useState(0);
    const [key, setKey] = useState();
@@ -84,7 +83,6 @@ const Chip = ({ file, render }) => {
                   counter: pc.stack[pc.stack.length - 1], 
                   stack: [...pc.stack.slice(0, pc.stack.length - 1)]
                }));
-               //setStack(stack => [...stack.slice(0, stack.length - 1)]);
             }
             break;
          case 1:
@@ -95,8 +93,6 @@ const Chip = ({ file, render }) => {
                stack: [...pc.stack, pc.counter],
                counter: addr - SHIFT 
             }));
-            // setStack(stack => [...stack, pc]);
-            // setPC(addr - SHIFT);
             break;
          case 3:
             if(registers[secondNibble] === secondByte)
@@ -182,7 +178,6 @@ const Chip = ({ file, render }) => {
             break;
          case 0xB:
             setPC(p => ({...p, counter: (addr + registers[0x0]) - SHIFT }));
-            //setPC((addr + registers[0x0]) - SHIFT);
             break;
          case 0xC:
             newReg[secondNibble] = Math.floor(Math.random() * (1 << 8)) & secondByte;
@@ -257,7 +252,6 @@ const Chip = ({ file, render }) => {
          default:
             break;
       }
-      //console.log(instruction.toString(16) + " - " + pc + "/" + stack[stack.length-1]);
    }, [dTimer, iRegister, registers, display, key, memory, render, changeDisplay]);
 
    useEffect(() => {
@@ -270,6 +264,8 @@ const Chip = ({ file, render }) => {
 
    useEffect(() => {
       setMemory([...FONT, ...file]);
+      setDisplay([]);
+      setPC({counter: FONT.length, stack: []});
       let newReg = [];
       for(let i = 0; i <= 0xf; i++) 
          newReg[i] = 0;
