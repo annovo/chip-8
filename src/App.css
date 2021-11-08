@@ -1,6 +1,6 @@
 body {
-   background-color: black;
-   color: white;
+   background-color: white;
+   color: black;
 }
 
 .main {
@@ -19,12 +19,13 @@ body {
 }
 
 canvas {
-   width: 640px;
-   height: 320px;
-   top: 30%;
-   left: 30%;
+   width: 642px;
+   height: 322px;
+   top: 5%;
+   left: 5%;
    position: absolute;
    text-align: center;
+   border: 2px solid black;
 }
 
 .upload {

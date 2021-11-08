@@ -302,10 +302,13 @@ const Chip = ({ file, render }) => {
             setSTimer(sTimer - 1);
             beep.play();
          }
+
+         if(display)
+            render(canvasRef.current.getContext('2d'), display, WIDTH, HEIGHT);
       }, 17);   
       
       return () => clearInterval(intervalTimer);
-   }, [dTimer, sTimer, beep]);
+   }, [dTimer, sTimer, beep, display, render]);
 
    return(
       <>
