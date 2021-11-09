@@ -54,7 +54,7 @@ h1 {
 
 /* The left side */
 .three-dimensions-card::before {
-   background: rgba(0, 0, 0, 0.3);
+   background: coral;
    content: '';
 
    /* Position */
@@ -71,7 +71,7 @@ h1 {
 
 /* The bottom side */
 .three-dimensions-card::after {
-   background: rgba(0, 0, 0, 0.3);
+   background: coral;
    content: '';
 
    /* Position */
@@ -121,6 +121,14 @@ h1 {
    font-size:13px;
    color:#aaa;
    margin-bottom:0;
+ }
+
+ .btn-outline-secondary:not(:disabled):not(.disabled).active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .show>.btn-outline-secondary.dropdown-toggle {
+    background-color: coral;
+ }
+
+ .btn-outline-secondary:hover {
+   background-color: coral;
  }
 
 #uploadBtn {
