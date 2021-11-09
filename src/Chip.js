@@ -17,6 +17,9 @@ const Chip = ({ file }) => {
 
    useEffect(() => {
       setCh(new Chip8(file));
+      return () => {
+         setCh(null);
+      }
    }, [file]);
    
    useEffect(() => {
