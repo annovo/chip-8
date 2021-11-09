@@ -1,258 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState } from "react";
+import Chip8 from "./chip8";
 
-const WIDTH = 64;
-const HEIGHT = 32;
-const KEYBOARD = ["Digit1", "Digit2", "Digit2", "Digit4",
-   "KeyQ", "KeyW", "KeyE", "KeyR",
-   "KeyA", "KeyS", "KeyD", "KeyF",
-   "KeyZ", "KeyX", "KeyC", "KeyV"];       // scan codes for keyboard 
-const FONT = new Uint8Array([                            // default font
-   0xF0, 0x90, 0x90, 0x90, 0xF0,
-   0x20, 0x60, 0x20, 0x20, 0x70,
-   0xF0, 0x10, 0xF0, 0x80, 0xF0,
-   0xF0, 0x10, 0xF0, 0x10, 0xF0,
-   0x90, 0x90, 0xF0, 0x10, 0x10,
-   0xF0, 0x80, 0xF0, 0x10, 0xF0,
-   0xF0, 0x80, 0xF0, 0x90, 0xF0,
-   0xF0, 0x10, 0x20, 0x40, 0x40,
-   0xF0, 0x90, 0xF0, 0x90, 0xF0,
-   0xF0, 0x90, 0xF0, 0x10, 0xF0,
-   0xF0, 0x90, 0xF0, 0x90, 0x90,
-   0xE0, 0x90, 0xE0, 0x90, 0xE0,
-   0xF0, 0x80, 0x80, 0x80, 0xF0,
-   0xE0, 0x90, 0x90, 0x90, 0xE0,
-   0xF0, 0x80, 0xF0, 0x80, 0xF0,
-   0xF0, 0x80, 0xF0, 0x80, 0x80
-]);
-
-const SHIFT = 512 - FONT.length;                        // first 512 is missing from the memory exept for the font
-const Chip = ({ file, render }) => {
-   const [memory, setMemory] = useState([...FONT]);
-   const [registers, setRegisters] = useState([]);
-   const [display, setDisplay] = useState([]);
-   const [pc, setPC] = useState({counter: FONT.length, stack: []});
-   const [iRegister, setIregister] = useState(0);
-   const [key, setKey] = useState();
-   const [dTimer, setDTimer] = useState(0);
-   const [sTimer, setSTimer] = useState(0);
+const Chip = ({ file }) => {
+   const [ch, setCh] = useState();
    const [beep, setBeep] = useState();
+   const [key, setKey] = useState();
    const canvasRef = useRef(null);
-
-   const changeDisplay = useCallback((VX, VY, N) => {
-      let y = registers[VY] & (HEIGHT - 1);
-      let i = iRegister - SHIFT;
-      const lastRow = N + i;
-      let regVF = 0; // setting flag register to 0;
-      let newDisplay = [...display];
-
-      for(i, y; i < lastRow && y < HEIGHT; i++, y++) {
-         const sprite = memory[i];
-         for(let j = 1 << 7, x = registers[VX] & (WIDTH - 1); j > 0 && x < WIDTH; j >>= 1, x++) {  
-            if(!newDisplay[y])
-               newDisplay[y] = [];
-
-            if((sprite & j) === 0)
-               continue;
-
-            if(newDisplay[y][x])
-               regVF = 1;
-            newDisplay[y][x] = !newDisplay[y][x];
-         }
-      }
-      
-      setDisplay(newDisplay);
-      setRegisters([...registers.slice(0, 0xf), regVF]);
-   },[display, iRegister, memory, registers]);
-
-   const decode = useCallback((instruction) => {
-      const firstNibble = (instruction & 0b1111000000000000) >> 12;  // first half bit
-      const secondNibble = (instruction & 0b0000111100000000) >> 8;  // second half bit
-      const thirdNibble = (instruction & 0b0000000011110000) >> 4;   // third half bit
-      const fourthNibble = (instruction & 0b0000000000001111);
-      const secondByte = (instruction & 0b0000000011111111);         // NN
-      const addr = (instruction & 0b0000111111111111);               // NNN
-      let newReg = [...registers];
-      
-      switch(firstNibble) {
-         case 0:
-            if(secondNibble === 0 && fourthNibble === 0 && thirdNibble === 0xe){
-               setDisplay([]);
-               render(canvasRef.current.getContext('2d'), display);
-            } else if(secondNibble === 0 && fourthNibble === 0xe && thirdNibble === 0xe){
-               setPC(pc => ({
-                  counter: pc.stack[pc.stack.length - 1], 
-                  stack: [...pc.stack.slice(0, pc.stack.length - 1)]
-               }));
-            }
-            break;
-         case 1:
-            setPC(p => ({ ...p, counter : addr - SHIFT}));
-            break;
-         case 2:
-            setPC(pc => ({
-               stack: [...pc.stack, pc.counter],
-               counter: addr - SHIFT 
-            }));
-            break;
-         case 3:
-            if(registers[secondNibble] === secondByte)
-               setPC(p => ({...p, counter: p.counter + 2}));
-            break;
-         case 4:
-            if(registers[secondNibble] !== secondByte)
-               setPC(p => ({...p, counter: p.counter + 2}));
-            break;
-         case 5:
-            if(registers[secondNibble] === registers[thirdNibble])
-               setPC(p => ({...p, counter: p.counter + 2}));
-            break;
-         case 6:
-            newReg[secondNibble] = secondByte;
-            setRegisters(newReg);
-            break;
-         case 7:
-            newReg[secondNibble] = (newReg[secondNibble] + secondByte) % (1 << 8);  // in case of overflow
-            setRegisters(newReg);
-            break;
-         case 8: 
-            const vx = secondNibble;
-            const vy = thirdNibble;
-            switch(fourthNibble) {
-               case 0:
-                  newReg[vx] = newReg[vy];
-                  break;
-               case 1:
-                  newReg[vx] = newReg[vx] | newReg[vy];
-                  break;
-               case 2:
-                  newReg[vx] = newReg[vx] & newReg[vy];
-                  break;
-               case 3:
-                  newReg[vx] = newReg[vx] ^ newReg[vy];
-                  break;
-               case 4:
-                  const val = newReg[vx] + newReg[vy];
-                  const vf = val >= (1 << 8) ? 1 : 0;    // in case of overflow set flag register to 1
-                  newReg[vx] = val % (1 << 8);
-                  newReg[0xf] = vf;          
-                  break;
-               case 5:
-                  if(newReg[vx] >= newReg[vy]) {
-                     newReg[0xf] = 1;
-                     newReg[vx] = newReg[vx] - newReg[vy];
-                  } else {
-                     newReg[0xf] = 0;
-                     newReg[vx] = (1 << 8) - (newReg[vy] - newReg[vx]); // in case of underflow
-                  }
-                  break;
-               case 6:
-                  // newReg[vx] = newReg[vy];      // configurable for superChip
-                  newReg[0xf] = newReg[vx] & 1;
-                  newReg[vx] = newReg[vx] >> 1;
-                  break;
-               case 7:
-                  if(newReg[vy] >= newReg[vx]) {
-                     newReg[0xf] = 1;
-                     newReg[vx] = newReg[vy] - newReg[vx];
-                  } else {
-                     newReg[0xf] = 0;
-                     newReg[vx] = (1 << 8) - (newReg[vx] - newReg[vy]); // in case of underflow
-                  }
-                  break;
-               case 0xE:
-                  // newReg[vx] = newReg[vy];      // configurable for superChip
-                  newReg[0xf] = (newReg[vx] >> 7) & 1;
-                  newReg[vx] = (newReg[vx] << 1) % (1 << 8); // in case of overflow
-                  break;
-               default:
-                  break;
-            }
-            setRegisters(newReg);
-            break;
-         case 9:
-            if(registers[secondNibble] !== registers[thirdNibble])
-               setPC(p => ({...p, counter: p.counter + 2}));
-            break;
-         case 0xA:
-            setIregister(addr);
-            break;
-         case 0xB:
-            setPC(p => ({...p, counter: (addr + registers[0x0]) - SHIFT }));
-            break;
-         case 0xC:
-            newReg[secondNibble] = Math.floor(Math.random() * (1 << 8)) & secondByte;
-            setRegisters(newReg);
-            break;
-         case 0xD:
-            changeDisplay(secondNibble, thirdNibble, fourthNibble);
-            render(canvasRef.current.getContext('2d'), display, WIDTH, HEIGHT);
-            break;
-         case 0xE:
-            if(thirdNibble === 9 && fourthNibble === 0xe && key === KEYBOARD[registers[secondNibble]]) {
-               setPC(p => ({...p, counter: p.counter + 2}));
-            } else if(thirdNibble === 0xa && fourthNibble === 1 && key !== KEYBOARD[registers[secondNibble]]) {
-               setPC(p => ({...p, counter: p.counter + 2}));
-            }
-            break;
-         case 0xF: 
-            let newMem; 
-            switch(secondByte) {
-               case 0x07: 
-                  newReg[secondNibble] = dTimer;
-                  setRegisters(newReg);
-                  break;
-               case 0x15: 
-                  setDTimer(registers[secondNibble]);
-                  break;
-               case 0x18:
-                  setSTimer(registers[secondNibble]);
-                  break;
-               case 0x1E:
-                  if((registers[secondNibble] + iRegister) >= 0x1000) {    // overflow outside the memory
-                     newReg[0xf] = 1;
-                  }
-                  setIregister((iRegister + registers[secondNibble]) % 0x1000);
-                  break;
-               case 0x0A:
-                  if(key && KEYBOARD.includes(key)) {
-                     newReg[secondNibble] = KEYBOARD.indexOf(key);
-                     setRegisters(newReg);
-                  } else  
-                     setPC(p => ({...p, counter: p.counter + 2}));
-                  break;
-               case 0x29:
-                  // characters 
-                  setIregister((registers[secondNibble] & (0b0000000000001111))*5); // take only last 4bits 
-                  break;
-               case 0x33:
-                  newMem = [...memory];
-                  const idx = iRegister - SHIFT;
-                  newMem[idx] = Math.floor(registers[secondNibble] / 100);
-                  newMem[idx + 1] = Math.floor(registers[secondNibble] / 10) % 10;
-                  newMem[idx + 2] =registers[secondNibble] % 10;
-                  setMemory(newMem);
-                  break;
-               case 0x55:  // configurable to set iregister to the value of I + X + 1
-                  newMem = [...memory];
-                  for(let i = 0; i <= secondNibble; i++) {
-                     newMem[iRegister - SHIFT + i] = registers[i];
-                  }
-                  setMemory(newMem);
-                  break;
-               case 0x65:  // configurable to set iregister to the value of I + X + 1
-                  for(let i = 0; i <= secondNibble; i++) {
-                     newReg[i] = memory[iRegister - SHIFT + i];
-                  }
-                  setRegisters(newReg);
-                  break;
-               default:
-                  break;
-            }
-            break;
-         default:
-            break;
-      }
-   }, [dTimer, iRegister, registers, display, key, memory, render, changeDisplay]);
 
    useEffect(() => {
       const canvas = canvasRef.current;
@@ -263,13 +16,7 @@ const Chip = ({ file, render }) => {
    },[]);
 
    useEffect(() => {
-      setMemory([...FONT, ...file]);
-      setDisplay([]);
-      setPC({counter: FONT.length, stack: []});
-      let newReg = [];
-      for(let i = 0; i <= 0xf; i++) 
-         newReg[i] = 0;
-      setRegisters(newReg);
+      setCh(new Chip8(file));
    }, [file]);
    
    useEffect(() => {
@@ -282,33 +29,31 @@ const Chip = ({ file, render }) => {
 
    useEffect(() => {
       const interval = setInterval(() => {
-         if(memory.length <= FONT.length) {
+         if(ch.memory.length <= ch.FONT.length) {
             return;
          }
-         const instr = (memory[pc.counter] << 8) | memory[pc.counter + 1];
-         setPC(p => ({...p, counter: p.counter + 2}));
-         decode(instr);
+         ch.run(key, canvasRef.current.getContext('2d'));
       }, 2);   
       
       return () => clearInterval(interval);
-   }, [memory, pc, decode]);
+   }, [ch, key]);
 
    useEffect(() => {
       const intervalTimer = setInterval(() => {
-         if(dTimer > 0) 
-            setDTimer(dTimer - 1);
+         if(ch.dTimer > 0) 
+            ch.dTimer -= 1;
          
-         if(sTimer > 0) {
-            setSTimer(sTimer - 1);
+         if(ch.sTimer > 0) {
+            ch.sTimer -= 1;
             beep.play();
          }
 
-         if(display)
-            render(canvasRef.current.getContext('2d'), display, WIDTH, HEIGHT);
+         if(ch.display)
+            ch.render(canvasRef.current.getContext('2d'));
       }, 17);   
       
       return () => clearInterval(intervalTimer);
-   }, [dTimer, sTimer, beep, display, render]);
+   }, [ch, beep]);
 
    return(
       <>
