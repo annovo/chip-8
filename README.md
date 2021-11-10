@@ -6,7 +6,7 @@ Chip-8 Emulator in React/JS to play Space Invaders, Pong etc.
 
 ## References
 
-Resourses to write this:
+Useful resourses:
 
 * https://en.wikipedia.org/wiki/CHIP-8
 * http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
