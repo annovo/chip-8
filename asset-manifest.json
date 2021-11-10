@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/chip-8/static/css/main.8296f1db.chunk.css",
+    "main.js": "/chip-8/static/js/main.4f4e6fcd.chunk.js",
+    "main.js.map": "/chip-8/static/js/main.4f4e6fcd.chunk.js.map",
+    "runtime-main.js": "/chip-8/static/js/runtime-main.1c4fc508.js",
+    "runtime-main.js.map": "/chip-8/static/js/runtime-main.1c4fc508.js.map",
+    "static/js/2.cc167480.chunk.js": "/chip-8/static/js/2.cc167480.chunk.js",
+    "static/js/2.cc167480.chunk.js.map": "/chip-8/static/js/2.cc167480.chunk.js.map",
+    "index.html": "/chip-8/index.html",
+    "static/css/main.8296f1db.chunk.css.map": "/chip-8/static/css/main.8296f1db.chunk.css.map",
+    "static/js/2.cc167480.chunk.js.LICENSE.txt": "/chip-8/static/js/2.cc167480.chunk.js.LICENSE.txt",
+    "static/media/IBMLogo.4fe4a61f.ch8": "/chip-8/static/media/IBMLogo.4fe4a61f.ch8",
+    "static/media/SpaceInvaders.a68e5212.ch8": "/chip-8/static/media/SpaceInvaders.a68e5212.ch8"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.1c4fc508.js",
+    "static/js/2.cc167480.chunk.js",
+    "static/css/main.8296f1db.chunk.css",
+    "static/js/main.4f4e6fcd.chunk.js"
+  ]
+}
