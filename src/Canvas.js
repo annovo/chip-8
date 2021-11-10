@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState } from "react";
 import Chip8 from "./Chip";
 
-const Chip = ({ file }) => {
+const Canvas = ({ file, keyPressed, setKey }) => {
    const [ch, setCh] = useState();
    const [beep, setBeep] = useState();
-   const [key, setKey] = useState();
    const canvasRef = useRef(null);
 
    useEffect(() => {
@@ -28,18 +27,18 @@ const Chip = ({ file }) => {
       return () => {
          document.removeEventListener('keydown', () => setKey(null));
       }
-   },[]);
+   },[setKey]);
 
    useEffect(() => {
       const interval = setInterval(() => {
          if(ch.memory.length <= ch.FONT.length) {
             return;
          }
-         ch.run(key, canvasRef.current.getContext('2d'));
+         ch.run(keyPressed, canvasRef.current.getContext('2d'));
       }, 2);   
       
       return () => clearInterval(interval);
-   }, [ch, key]);
+   }, [ch, keyPressed]);
 
    useEffect(() => {
       const intervalTimer = setInterval(() => {
@@ -65,4 +64,4 @@ const Chip = ({ file }) => {
    );
 }
 
-export default Chip;
+export default Canvas;

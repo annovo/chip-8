@@ -6,13 +6,13 @@ body {
 h1 {
    color: #111;
     font-family: 'Helvetica Neue', sans-serif;
-    font-size: 100px;
+    font-size: 80px;
     font-weight: bold;
     letter-spacing: -1px;
     line-height: 1;
     text-align: center;
     background-color: coral;
-    padding-bottom: 1%;
+    padding: 1%;
 }
 
  canvas {
@@ -39,9 +39,20 @@ h1 {
    margin-right: 16px;
 }
 
-.container__content {
+.control-btns {
    flex: 1;
    display: flex;
+   margin: 20% 0 0;
+}
+
+.cntr-p {
+   color: gray;
+   margin: 0 0 4% 0;
+   padding: 0 35%;
+}
+
+.container__content {
+   margin-left: 3%;
 }
 
 :root {
@@ -87,7 +98,7 @@ h1 {
 }
 
 .footer-basic {
-   margin: 10% 10%;
+   margin: 10% 10% 0 10%;
    padding:40px 0;
    background-color:#ffffff;
    color:#4b4c4d;
@@ -131,6 +142,100 @@ h1 {
    background-color: coral;
  }
 
+ .grid {
+   display: grid;
+   grid-template-columns: 60px 60px 60px 60px;
+   grid-gap: 10px;
+   background-color: #fff;
+   color: #444;
+ }
+ 
+ .box {
+   background-color: #444;
+   color: #fff;
+   border-radius: 5px;
+   padding: 10% 0% 10% 30%;
+   font-size: 200%;
+   /* padding: 10% 45%;
+   font-size: 100%; */
+ }
+ 
+ .box:hover {
+    background-color: coral;
+    cursor: pointer;
+ }
+ .one {
+   grid-column-start: 1;
+   grid-column-end: 2;
+   grid-row-start: 1;
+   grid-row-end: 2;
+}
+.two {
+   grid-column-start: 2;
+   grid-column-end: 3;
+   grid-row-start: 1;
+   grid-row-end: 2;
+}
+.three {
+   grid-column-start: 3;
+   grid-column-end: 4;
+   grid-row-start: 1;
+   grid-row-end: 2;
+}
+.four {
+   grid-column-start: 4;
+   grid-column-end: 5;
+   grid-row-start: 1;
+   grid-row-end: 2;
+}
+.q {
+   grid-column-start: 1;
+   grid-column-end: 2;
+   grid-row-start: 2;
+   grid-row-end: 3;
+}
+.w {
+   grid-column-start: 2;
+   grid-column-end: 3;
+   grid-row-start: 2;
+   grid-row-end: 3;
+}
+.e {
+   grid-column-start: 3;
+   grid-column-end: 4;
+   grid-row-start: 2;
+   grid-row-end: 3;
+}
+.r {
+   grid-column-start: 4;
+   grid-column-end: 5;
+   grid-row-start: 2;
+   grid-row-end: 3;
+}
+.a {
+   grid-column-start: 1;
+   grid-column-end: 2;
+   grid-row-start: 3;
+   grid-row-end: 4;
+}
+.s {
+   grid-column-start: 2;
+   grid-column-end: 3;
+   grid-row-start: 3;
+   grid-row-end: 4;
+}
+.d {
+   grid-column-start: 3;
+   grid-column-end: 4;
+   grid-row-start: 3;
+   grid-row-end: 4;
+}
+.f{
+   grid-column-start: 4;
+   grid-column-end: 5;
+   grid-row-start: 3;
+   grid-row-end: 4;
+}
 #uploadBtn {
    margin-right: 3%;
 }

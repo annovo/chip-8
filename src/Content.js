@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Chip from './Canvas'
+import Canvas from './Canvas'
 import ibmLogo from './files/IBMLogo.ch8'
 import spaceInvaders from './files/SpaceInvaders.ch8'
 import { DropdownButton, Dropdown, Button } from 'react-bootstrap'
 import './App.css'
+import Control from './Control'
 
-const Canvas = () => {
+const Content = () => {
    const [file, setFile] = useState([]);
    const [title, setTitle] = useState("Space Invaders");
+   const [keyPressed, setKey] = useState();
    const inputRef = useRef(null);
 
    const handleSelected = async (e) => {
@@ -55,22 +57,25 @@ const Canvas = () => {
       <div className = "container">
          <div className = "container__media" > 
             <div className = "three-dimensions-card">
-               <Chip file = {file} />
+               <Canvas file = {file} keyPressed = {keyPressed} setKey = {setKey} />
             </div>
          </div>
          <div className = "container__content">
-            <div id = "uploadBtn">
-               <Button variant = "outline-secondary" onClick = {handleInput}> Upload </Button>
+            <Control setKey = {setKey} />
+            <div className = "control-btns">
+               <div id = "uploadBtn">
+                  <Button variant = "outline-secondary" onClick = {handleInput}> Upload </Button>
+               </div>
+               <input ref={inputRef} style = {{display: 'none'}} type="file" onChange = {handleSelected} />
+               <DropdownButton id="dropdown-item-button" variant = "outline-secondary" title={title} onClick = {handleSelected} >
+                     <Dropdown.Item as="button" value = "ibmLogo">IBM logo</Dropdown.Item>
+                     <Dropdown.Item as="button" value = "spaceInv">Space Invaders</Dropdown.Item>
+               </DropdownButton>
             </div>
-            <input ref={inputRef} style = {{display: 'none'}} type="file" onChange = {handleSelected} />
-            <DropdownButton id="dropdown-item-button" variant = "outline-secondary" title={title} onClick = {handleSelected} >
-                  <Dropdown.Item as="button" value = "ibmLogo">IBM logo</Dropdown.Item>
-                  <Dropdown.Item as="button" value = "spaceInv">Space Invaders</Dropdown.Item>
-            </DropdownButton>
          </div>     
       </div>
    </>
   )
 }
 
-export default Canvas
+export default Content
