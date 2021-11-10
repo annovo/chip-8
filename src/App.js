@@ -2,9 +2,11 @@ import './App.css'
 import Content from './Content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import React from 'react';
 function App() {
   return (
     <div>
+      <React.StrictMode>
       <Content />
       <div className ="footer-basic">
         <footer>
@@ -19,6 +21,7 @@ function App() {
             <p className="copyright">Anastasiia Novoselova © 2021</p>
         </footer>
     </div>
+    </React.StrictMode>
     </div>
   );
 }

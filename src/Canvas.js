@@ -27,7 +27,7 @@ const Canvas = ({ file, keyPressed, setKey }) => {
       return () => {
          document.removeEventListener('keydown', () => setKey(null));
       }
-   },[setKey]);
+   },);
 
    useEffect(() => {
       const interval = setInterval(() => {
