@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chip8 from "./Chip";
 
 const Canvas = ({ file, keyPressed, setKey }) => {
