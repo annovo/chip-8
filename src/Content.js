@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import Canvas from './Canvas'
 import ibmLogo from './files/IBMLogo.ch8'
 import spaceInvaders from './files/SpaceInvaders.ch8'
+import airplane from './files/Airplane.ch8'
+import astro from './files/AstroDodge.ch8'
+import brick from './files/Brick.ch8'
+import tank from './files/Tank.ch8'
+import kaleidoscope from './files/Kaleidoscope.ch8'
 import { DropdownButton, Dropdown, Button } from 'react-bootstrap'
 import './App.css'
 import Control from './Control'
@@ -21,6 +26,26 @@ const Content = () => {
          case "spaceInv":
             upload(await fetch(spaceInvaders).then(r => r.blob()));
             setTitle("Space Invaders");
+            break;
+         case "airplane":
+            upload(await fetch(airplane).then(r => r.blob()));
+            setTitle("Airplane");
+            break;
+         case "astro":
+            upload(await fetch(astro).then(r => r.blob()));
+            setTitle("Astro Dodge");
+            break;
+         case "tank":
+            upload(await fetch(tank).then(r => r.blob()));
+            setTitle("Tank");
+            break;
+         case "brick":
+            upload(await fetch(brick).then(r => r.blob()));
+            setTitle("Brick");
+            break;
+         case "kaleidoscope":
+            upload(await fetch(kaleidoscope).then(r => r.blob()));
+            setTitle("Kaleidoscope");
             break;
          default:
             if (e.target && e.target.files) {
@@ -68,8 +93,13 @@ const Content = () => {
                </div>
                <input ref={inputRef} style = {{display: 'none'}} type="file" onChange = {handleSelected} />
                <DropdownButton id="dropdown-item-button" variant = "outline-secondary" title={title} onClick = {handleSelected} >
-                     <Dropdown.Item as="button" value = "ibmLogo">IBM logo</Dropdown.Item>
                      <Dropdown.Item as="button" value = "spaceInv">Space Invaders</Dropdown.Item>
+                     <Dropdown.Item as="button" value = "ibmLogo">IBM logo</Dropdown.Item>
+                     <Dropdown.Item as="button" value = "airplane">Airplane</Dropdown.Item>
+                     <Dropdown.Item as="button" value = "astro">Astro Dodge</Dropdown.Item>
+                     <Dropdown.Item as="button" value = "brick">Brick</Dropdown.Item>
+                     <Dropdown.Item as="button" value = "kaleidoscope">Kaleidoscope</Dropdown.Item>
+                     <Dropdown.Item as="button" value = "tank">Tank</Dropdown.Item>
                </DropdownButton>
             </div>
          </div>     

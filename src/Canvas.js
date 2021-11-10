@@ -15,7 +15,11 @@ const Canvas = ({ file, keyPressed, setKey }) => {
    },[]);
 
    useEffect(() => {
-      setCh(new Chip8(file));
+      if(file.length > Chip8.MAX_MEM)
+         return;
+      else
+         setCh(new Chip8(file));
+
       return () => {
          setCh(null);
       }
@@ -31,9 +35,6 @@ const Canvas = ({ file, keyPressed, setKey }) => {
 
    useEffect(() => {
       const interval = setInterval(() => {
-         if(ch.memory.length <= ch.FONT.length) {
-            return;
-         }
          ch.run(keyPressed, canvasRef.current.getContext('2d'));
       }, 2);   
       
