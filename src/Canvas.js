@@ -26,10 +26,12 @@ const Canvas = ({ file, keyPressed, setKey }) => {
    }, [file]);
    
    useEffect(() => {
-      document.addEventListener('keydown', (e) => setKey(e.code));
+      document.addEventListener('keydown', (e) => { e.preventDefault(); setKey(e.code); });
+      document.addEventListener('keyup', () => setKey(null));
 
       return () => {
          document.removeEventListener('keydown', () => setKey(null));
+         document.removeEventListener('keyup', () => setKey(null));
       }
    },);
 
