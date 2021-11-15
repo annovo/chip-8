@@ -6,7 +6,6 @@ import airplane from './files/Airplane.ch8'
 import astro from './files/AstroDodge.ch8'
 import brick from './files/Brick.ch8'
 import tank from './files/Tank.ch8'
-import kaleidoscope from './files/Kaleidoscope.ch8'
 import { DropdownButton, Dropdown, Button } from 'react-bootstrap'
 import './App.css'
 import Control from './Control'
@@ -42,10 +41,6 @@ const Content = () => {
          case "brick":
             upload(await fetch(brick).then(r => r.blob()));
             setTitle("Brick");
-            break;
-         case "kaleidoscope":
-            upload(await fetch(kaleidoscope).then(r => r.blob()));
-            setTitle("Kaleidoscope");
             break;
          default:
             if (e.target && e.target.files) {
@@ -98,7 +93,6 @@ const Content = () => {
                      <Dropdown.Item as="button" value = "airplane">Airplane</Dropdown.Item>
                      <Dropdown.Item as="button" value = "astro">Astro Dodge</Dropdown.Item>
                      <Dropdown.Item as="button" value = "brick">Brick</Dropdown.Item>
-                     <Dropdown.Item as="button" value = "kaleidoscope">Kaleidoscope</Dropdown.Item>
                      <Dropdown.Item as="button" value = "tank">Tank</Dropdown.Item>
                </DropdownButton>
             </div>
